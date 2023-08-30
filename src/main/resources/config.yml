@@ -1,0 +1,3 @@
+
+enabled-by-default: true
+send-notification-on-join: true

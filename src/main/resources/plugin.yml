@@ -1,0 +1,12 @@
+name: ChatPings
+version: '${project.version}'
+main: me.corxl.chatpings.ChatPings
+api-version: 1.16
+prefix: Chat Pings
+authors: [ Corxl ]
+website: https://github.com/Corxl
+
+commands:
+  chatpings:
+    permission: chatpings.use
+    permission-message: §l§2[§3EcoTP§2]§r §o§cYou do not have permission!
