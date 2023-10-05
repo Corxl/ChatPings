@@ -96,7 +96,7 @@ public class ChatPingsCommand implements CommandExecutor {
         try {
             Sound s = Sound.valueOf(args[1].toUpperCase());
             float volume = Float.parseFloat(args[2]);
-            float pitch = Float.parseFloat(args[2]);
+            float pitch = Float.parseFloat(args[3]);
 
             PersistentDataContainer c = p.getPersistentDataContainer();
             c.set(ChatPings.chatSound, PersistentDataType.STRING, s.toString());

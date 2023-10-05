@@ -6,6 +6,8 @@ import me.corxl.chatpings.Commands.ChatPingsCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -58,22 +60,34 @@ public class ChatListener implements Listener {
     public void onChatMessage(AsyncChatEvent event) {
         // Notify all players that a chat message was sent.
         List<Player> playersToPing = plugin.getServer().getOnlinePlayers().stream().filter(p -> p.getPersistentDataContainer().has(ChatPings.chatPingKey, PersistentDataType.BOOLEAN) && p.getPersistentDataContainer().get(ChatPings.chatPingKey, PersistentDataType.BOOLEAN)).collect(Collectors.toList());
-        for (Player p : playersToPing) {
 
-            if (p.getPersistentDataContainer().has(ChatPings.chatSound)) {
-                PersistentDataContainer c = p.getPersistentDataContainer();
-                Sound s = Sound.valueOf(c.get(ChatPings.chatSound, PersistentDataType.STRING));
-                float volume = c.get(ChatPings.chatSoundVolume, PersistentDataType.FLOAT);
-                float pitch = c.get(ChatPings.chatSoundPitch, PersistentDataType.FLOAT);
-                float rand = randFloat(pitch-0.5f < 0 ? 0 : pitch-0.5f, pitch+0.5f);
-                p.playSound(p.getLocation(), s, volume, rand);
-            } else {
-                float rand = randFloat(0.2f, 0.9f);
-                p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 3.0f, rand);
-
+        String text = ChatColor.stripColor(PlainTextComponentSerializer.plainText().serialize(event.message()));
+        if (text.startsWith("@")) {
+            String player = text.split(" ")[0].toLowerCase().replace("@", "");
+            for (Player p : plugin.getServer().getOnlinePlayers()) {
+                if (p.getName().toLowerCase().startsWith(player) || p.getDisplayName().toLowerCase().startsWith(player)) {
+                    p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 3.0f, 0.6f);
+                }
             }
+        } else {
+            for (Player p : playersToPing) {
+                if (p.getPersistentDataContainer().has(ChatPings.chatSound)) {
+                    PersistentDataContainer c = p.getPersistentDataContainer();
+                    Sound s = Sound.valueOf(c.get(ChatPings.chatSound, PersistentDataType.STRING));
+                    float volume = c.get(ChatPings.chatSoundVolume, PersistentDataType.FLOAT);
+                    float pitch = c.get(ChatPings.chatSoundPitch, PersistentDataType.FLOAT);
+                    float rand = randFloat(pitch-0.2f < 0 ? 0.1f : pitch-0.2f, pitch+0.2f);
+                    p.playSound(p.getLocation(), s, volume, rand);
+                } else {
+                    float rand = randFloat(0.2f, 0.9f);
+                    p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 3.0f, rand);
 
+                }
+            }
         }
+
+
+
     }
 
     private float randFloat(float min, float max) {
